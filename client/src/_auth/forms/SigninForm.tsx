@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import axios from 'axios'
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import {
@@ -7,26 +8,27 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { SignupValidation } from "@/lib/validation"
+import { SigninValidation } from "@/lib/validation"
 import Loader from "@/components/shared/Loader"
 const SigninForm = () => {
   const isLoading=false
   // 1. Define your form.
-  const form = useForm<z.infer<typeof SignupValidation>>({
-    resolver: zodResolver(SignupValidation),
+  const form = useForm<z.infer<typeof SigninValidation>>({
+    resolver: zodResolver(SigninValidation),
     defaultValues: {
-      name:"",
-      username: "",
       email:"",
       password:""
     },
   })
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof SignupValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+
+  async function onSubmit(values: z.infer<typeof SigninValidation>) {
+    try{
+      const res=await axios.post("http://localhost:4000/user/signin", values, { withCredentials: true }) // Allow cookies
+      console.log(res)
+    }catch(err){
+      console.log(err)
+    }
   }
   return (
     <Form {...form}>
@@ -69,7 +71,7 @@ const SigninForm = () => {
             <div className="flex-center gap-2">
              <Loader/> Loading...
             </div>
-          ): "Sign up"}
+          ): "Sign in"}
         </Button>
         <p className="text-small-regular text-light-2 text-center mt-2">
           New user?
